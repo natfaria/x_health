@@ -3,11 +3,100 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 import seaborn as sns
+
+from sklearn.feature_selection import mutual_info_classif
 from typing import List, Union, Any, Optional, Tuple
 
 
-#Percentual e taxas
-def taxas(
+#################################################
+#                  Get WoE                      #
+#################################################
+def get_woe(base: pd.DataFrame, 
+            woe: pd.DataFrame, 
+            variavel_analise: str, 
+            is_categorical: bool = False
+):
+    variable_filter = woe["Variável"] = variavel_analise
+    woe_data = woe[variable_filter][['Corte', 'WoE']]
+
+    if is_categorical:
+        base = base.merge(woe_data, left_on=variavel_analise, right_on='Corte', how='left')
+        base - base.drop(columns='Corte')
+    else:
+        base['Corte'] = pd.cut(
+            base[variavel_analise].astype(float),
+            bins = pd.IntervalIndex(woe_data['Corte']),
+            labels = woe_data['Corte'].astype(str)
+        )
+        base = base.merge(woe_data, on='Corte', how='left')    
+
+    base = base.rename(columns={"Corte": f'Corte_{variavel_analise}', 'WoE': f'Woe{variavel_analise}'}, errors='ignore')
+    return base
+
+
+#################################################
+#                   IV / WOE                    #
+#################################################
+def iv_woe(
+        data: pd.DataFrame, 
+        target: str, 
+        bins: int=10, 
+        show_woe: bool = True,
+        show_iv: bool = True
+):
+    """
+    Parameters
+    -----------
+    data: DataFrame
+        Dataframe where independent and dependent variables are stored
+    target: str
+        Target variable.
+    bins: int
+        Total of bins or intervals, 10 by default.
+    show_woe: bool
+        If the WOE values are shown in the table, True by default
+    show_iv: bool
+        if the IV values are shown in the table, True by default
+    """   
+    
+    newDF, woeDF = pd.DataFrame(), pd.DataFrame()
+    cols = data.columns
+
+    #Run IV and WOE on all independent variables
+    for ivars in cols[~cols.isin([target])]:
+        if (data[ivars].dtype.kind in 'bifc') and (len(np.unique(data[ivars]))>10):
+            binned_x = pd.qcut(data[ivars], bins, duplicates='drop')
+            d0 = pd.DataFrame({'x': binned_x, 'y': data[target]})
+        else:
+            d0 = pd.DataFrame({'x': data[ivars], 'y': data[target]})
+        
+        d = d0.groupby('x', as_index=False).agg({'y': ['count', 'sum']})
+        d.columns = ['Corte', 'N', 'Eventos']
+        d['% de Eventos'] = np.maximum(d['Eventos'], 0.5) / d['Eventos'].sum()
+        d['Nao-Eventos'] = d['N'] - d['Eventos']
+        d['% de Nao-Eventos'] = np.maximum(d['Nao-Eventos'], 0.5) / d['Nao-Eventos'].sum()
+        d['WoE'] = np.log(d['% de Eventos'] / d['% de Nao-Eventos'])
+        d['IV'] = d['WoE'] * (d['% de Eventos'] - d['% de Nao-Eventos'])
+        d.insert(loc=0, column='Variavel', value=ivars)
+
+        if show_iv == True:
+            print(f'\033[mInformation Value de \033[1m{ivars} \033[mé \033[1;34m{str(round(d['IV'].sum(),6))}')
+        
+        temp = pd.DataFrame({'Variavel' : [ivars], "IV": [d["IV"].sum()]}, columns = ['Variavel', 'IV'])
+        newDF = pd.concat([newDF, temp], axis=0)
+        woeDF = pd.concat([woeDF, d], axis=0)
+
+        # Show WOE Table
+        if show_woe == True:
+            print(d)
+    return newDF, woeDF
+
+
+
+#################################################
+#          Razão de Probabilidades              #
+#################################################
+def odds(
         database: pd.DataFrame,
         predictor_variables: List[str],
         target_variable: str = 'y',
@@ -17,7 +106,7 @@ def taxas(
 ):
 #-> pd.io.formats.style.Styler:
     """
-    Calculates odds rations for specified variables.
+    Calculates odds ratios for specified variables.
     
     Parameters
     ----------
@@ -71,16 +160,22 @@ def taxas(
     return din_agp
 
 
-def gera_taxa_por_quantis(database, var_exploratoria, var_alvo, q = 10, precisao = 2):
-    database[f'FXA_{var_exploratoria}_num'] = pd.qcut(database[var_exploratoria], q, labels=False, duplicates='drop')
-    database[f'FXA_{var_exploratoria}_desc'] = pd.qcut(database[var_exploratoria], q, precision=precisao, duplicates='drop')
-    database[f'FXA_{var_exploratoria}'] = database[f'FXA_{var_exploratoria}_num'].astype(str) + - + database[f'FXA_{var_exploratoria}_desc'].astype(str)
+
+#################################################
+#             Gera Odds por quartis             #
+#################################################
+def generate_odds_by_quantis(database, exploratory_variable, target_variable, q = 10, precisao = 2):
+    database[f'FXA_{exploratory_variable}_num'] = pd.qcut(database[exploratory_variable], q, labels=False, duplicates='drop')
+    database[f'FXA_{exploratory_variable}_desc'] = pd.qcut(database[exploratory_variable], q, precision=precisao, duplicates='drop')
+    database[f'FXA_{exploratory_variable}'] = database[f'FXA_{exploratory_variable}_num'].astype(str) + - + database[f'FXA_{exploratory_variable}_desc'].astype(str)
     
-    return taxas(database, vars_preditivas[f'FXA_{var_exploratoria}'], var_alvo = var_alvo)
+    return odds(database, predictor_variables=[f'FXA_{exploratory_variable}'], target_variable = target_variable)
 
 
-
-def get_feature_importances(database, target_variable, feature, discrete_features = 'auto'):
+#################################################
+#               Feature Importance              #
+#################################################
+def get_feature_importances(database, target_variable, features, discrete_features = 'auto'):
     if discrete_features != 'auto':
         discrete_features = [x in discrete_features for x in features]
 
@@ -93,18 +188,3 @@ def get_feature_importances(database, target_variable, feature, discrete_feature
     return pd.Series(importances, features)
 
 
-def plot_mi(
-    database: pd.DataFrame,
-    features,
-    target_variable: str = 'y',
-    figsize: Tuple = (10,6),
-    n: int = 15,
-    discrete_features = 'auto'
-):
-    fig, ax = plt.subplots(figsize = figsize)
-    
-    get_feature_importances(database, target_variable, features, discrete_features)\
-        .sort_values(ascending=False).head(n).sort_values()\
-        .plot.barh(ax=ax, color = "#0046c0", title = f'Informação mútua para conceito: {target_variable}')
-
-    plt.tight_layout()

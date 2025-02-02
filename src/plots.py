@@ -4,17 +4,128 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+from matplotlib.colors import LinearSegmentedColormap
+
 import seaborn as sns
 from typing import List, Union, Any, Optional, Tuple
 
 from scipy import stats
 
-import colour
+from src.eda import *
 
-COR_1: Color("#00a1fc") #azul claro
-COR_2: Color("#0046c0") #azul escuro
-COR_3: Color("#002375") #vermelho escuro
-COR_CINZA: Color("#999999")
+# cores personalizadas 
+COR_1 = "#b11a6c" #rosa
+COR_2 = "#373d7a" #azul escuro
+COR_3 = "#6e446b" #roxo escuro
+COR_CINZA = "#999999"
+
+
+
+#################################################
+#               Plot Mi
+#################################################
+def plot_mi(
+    database: pd.DataFrame,
+    features,
+    target_variable: str = 'y',
+    figsize: Tuple = (10,6),
+    n: int = 15,
+    discrete_features = 'auto'
+):
+    fig, ax = plt.subplots(figsize = figsize)
+    
+    get_feature_importances(database, target_variable, features, discrete_features)\
+        .sort_values(ascending=False).head(n).sort_values()\
+        .plot.barh(ax=ax, color = "#0046c0", title = f'Informação mútua para conceito: {target_variable}')
+
+    plt.tight_layout()
+
+
+
+#################################################
+#            Plot Correlation Heatmap           #
+#################################################
+def correlation_heatmap(
+    database: pd.DataFrame, method: str = 'pearson',
+    numeric_only: bool = True,
+    figsize: Tuple[int,int] = (10,10),
+    title: str = "Mapa de Calor de Correlação",
+    
+    cores: List[str] = ["#ff69b4", "#e31c79", "#800040"]
+) -> None:
+    
+    
+   # palete: Tuple[str,str] = ("#e31c79", "#2ca02c")
+    paleta_cores = LinearSegmentedColormap.from_list("CustomCores", cores, N=256)
+    #paleta_cores = LinearSegmentedColormap.from_list("CustomPink", ["#ff69b4", "#e31c79", "#800040"], N=256)
+    """
+    Plots a heatmap of the correlation matrix for the dataframe
+    
+    Parameters
+    ----------
+    database: DataFrame
+        DataFrame containing the dataset.
+    method: Optional, str
+        Method used to compute the correlation, 'pearson' by default.
+    numeric_only: Optional, bool
+        Whether to include only numeric columns in the correlation computation, True by default.
+    figsize: Optional, Tuple [int,int]
+        Size of the figure(width, height) in inches, (10,10) by default.
+
+    Returns
+    -------
+    None
+    """
+
+    #rosa_palette = ListedColormap(["#ff69b4", "#e31c79", "#800040"])
+    
+    correlations = database.corr(method=method, numeric_only=numeric_only)
+    mask = np.zeros_like(correlations)
+    mask[np.triu_indices_from(mask)] = True
+ 
+
+    fig, ax = plt.subplots(figsize=figsize)
+    sns.heatmap(
+        correlations,
+        mask=mask,
+        vmin=-1,  # Ajusta a escala para capturar correlações negativas corretamente
+        vmax=1,   # Garante que a cor rosa será aplicada corretamente para os valores positivos
+        center=0,
+        fmt= '.2f',
+        cmap=paleta_cores,
+        square=True,
+        linewidths=.5,
+        annot=True,
+        cbar_kws={'shrink':.70},
+        annot_kws={'fontsize': 8, "fontweight": 'demibold'}
+    )
+    plt.title(title)
+    plt.show
+
+
+
+
+
+#################################################
+#         Plot Bivariate Distribution           #
+#################################################
+
+import matplotlib.patches as mpatches
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+
+
+
+#COR_1 = "#e91e63"  # Rosa vibrante
+#COR_2 = "#3f51b5"  # Azul vibrante
+#COR_3 = "#9c27b0"  # Roxo vibrante
+#COR_CINZA = "#757575"  # Cinza para rótulos
+#################################################
+#         Plot Bivariate Distribution           #
+#################################################
 
 def plot_distribuicao_bivariada(
     df:pd.DataFrame,
@@ -57,9 +168,9 @@ def plot_distribuicao_bivariada(
     df_tmp = pd.DataFrame(df_tmp.groupby(variavel_analise)[['quantidade', nom_variavel_conceito]].sum()).reset_index()
 
     if sort_values:
-        df_tmp = sort_values(by=[quantidade], ascending=False, inplace=True)
+        df_tmp.sort_values(by=['quantidade'], ascending=False, inplace=True)
     else:
-        df_tmp = sort_values(by=[variavel_analise], inplace=True)
+        df_tmp.sort_values(by=[variavel_analise], inplace=True)
 
     df_tmp['qtd_nao_evento'] = (df_tmp['quantidade'] - df_tmp[nom_variavel_conceito]).astype(int)
     df_tmp['taxa_evento'] = (df_tmp[nom_variavel_conceito] / df_tmp['quantidade'])
@@ -73,28 +184,30 @@ def plot_distribuicao_bivariada(
     #################################
 
     bar_width = bar_width
-    x_loc = np.arrange(len(df_tmp))
+    x_loc = np.arange(len(df_tmp))
 
-    ax1.bar(x_loc + bar_width / 2, df_tmp[nom_variavel_conceito], width=bar_width, color=COR_1,
-            linestyle = '-', linewidth=4., alpha=0.6)
-    y1_b2_patch = mpatches.Patch(color=COR_1, label=label1, aplha=0.5)
+    # Ajuste das posições para colocar as barras lado a lado
+    ax1.bar(x_loc - bar_width / 2, df_tmp[nom_variavel_conceito], width=bar_width, color=COR_1,
+        linestyle='-', linewidth=4., alpha=0.6, label=label1)
+    y1_b1_patch = mpatches.Patch(color=COR_1, label=label1, alpha=0.5)
 
     ax1.bar(x_loc + bar_width / 2, df_tmp['qtd_nao_evento'], width=bar_width, color=COR_2,
-            linestyle = '-', linewidth=4., alpha=0.6)
-    y1_b2_patch = mpatches.Patch(color=COR_2, label=label2, aplha=0.5)
+        linestyle='-', linewidth=4., alpha=0.6, label=label2)
+    y1_b2_patch = mpatches.Patch(color=COR_2, label=label2, alpha=0.5)
+
 
     plt.ylabel('Quantidade de vendas', fontsize=y_labelsize)
 
     if show_bar_labels:
         for idx, bar in enumerate(ax1.patches):
-            if idx< len(df_temp):
+            if idx< len(df_tmp):
                 bar_value = bar.get_height()
                 text_x = bar.get_x() + bar.get_width() / 2
                 text_y = bar.get_y + bar_value
                 ax1.text(text_x, text_y, bar_value, ha='center', va='bottom', color='black', fontsize=label_fontsize)
 
     box = ax1.get_position()
-    ax1.set_position([box.x0, box.y0, box.height * 0.1, box.width, box.height * 0.9])
+    ax1.set_position([box.x0, box.y0 + box.height * 0.1, box.width, box.height * 0.9])
 
     ax1.yaxis.grid(True, linestyle = '--', which='major', color=COR_CINZA, alpha=.25)
     plt.gcf().autofmt_xdate(rotation=rotation, ha=ha)
@@ -107,6 +220,8 @@ def plot_distribuicao_bivariada(
         plt.xticks(df_tmp[variavel_analise])
     if custom_xticks:
         plt.xticks(np.arrange(0,len(custom_xticks)).tolist(),custom_xticks)
+
+
 
     #################################
     #          PLOTA TAXAS          #
@@ -126,16 +241,18 @@ def plot_distribuicao_bivariada(
     ax2.set_ylim([0, round(y_values.max()*1.1, 2)])
 
     if show_line_labels:
-        props = dict(boxstyle='round'(y_values.max()*1.1, 2))
+        props = dict(boxstyle='round', facecolor='white', alpha=0.5)
+        #props = dict(boxstyle=round(y_values.max()*1.1, 2))
         for x, y in enumerate(y_values):
             ax2.text(x, y + 0.1, f'{round(y, 2)}%',
                      ha='center', va = 'bottom',
                      color=COR_3, weight='bold', bbox=props)
 
+
     #################################
     #       PLOTA TAXA BASE         #
     #################################
-    taxa_base_fmt = round(100* taxa_base, 2)
+    taxa_base_fmt = round(100 * taxa_evento, 2)
     plt.axhline(taxa_base_fmt, color=COR_CINZA, linestyle = '--', alpha=0.7)
     base_patch = mpatches.Patch(color=COR_CINZA, label=f'Taxa base: {taxa_base_fmt}%')
 
@@ -157,7 +274,13 @@ def plot_distribuicao_bivariada(
     )
 
     sns.despine(right=False)
-    plt.show()
+    plt.show() 
+
+
+#################################################
+#           Plot Distribution Graph             #
+#################################################
+
 
 def plot_grafico_distribuicao(
         database: pd.DataFrame,
@@ -196,3 +319,19 @@ def plot_grafico_distribuicao(
     ax1.legend()
     ax2.legend()
     plt.show()
+
+def plot_mi(
+    database: pd.DataFrame,
+    features,
+    target_variable: str='y',
+    figsize: Tuple[int,int] = (10,6),
+    n: int=15,
+    discrete_features: str = 'auto'
+):
+    fig, ax = plt.subplots(figsize=figsize)
+
+    get_feature_importances(database, target_variable, features, discrete_features)\
+        .sort_values(ascending=False).head(n).sort_values()\
+        .plot.barh(ax=ax, color='#0046c0', title=f'Informação Mútua para conceito: {target_variable}')
+        
+    plt.tight_layout()

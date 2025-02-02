@@ -21,7 +21,6 @@ time
 seaborn
 csv
 matplotlib
-sklearn
 typing
 warnings
 loguru
