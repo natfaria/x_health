@@ -28,17 +28,40 @@ def plot_mi(
     database: pd.DataFrame,
     features,
     target_variable: str = 'y',
-    figsize: Tuple = (10,6),
+    figsize: tuple = (10,6),
     n: int = 15,
-    discrete_features = 'auto'
+    discrete_features = 'auto',
+    color: str = COR_1  # Cor padrão: rosa
 ):
-    fig, ax = plt.subplots(figsize = figsize)
-    
-    get_feature_importances(database, target_variable, features, discrete_features)\
-        .sort_values(ascending=False).head(n).sort_values()\
-        .plot.barh(ax=ax, color = "#0046c0", title = f'Informação mútua para conceito: {target_variable}')
+     
+     """
+     Plota a Informação Mútua (Mutual Information) para as principais variáveis.
 
-    plt.tight_layout()
+    Parâmetros:
+    -----------
+    database: pd.DataFrame
+        DataFrame contendo as variáveis independentes e a variável alvo.
+    features: list
+        Lista de colunas que representam as variáveis independentes.
+    target_variable: str
+        Nome da variável alvo.
+    figsize: tuple
+        Tamanho da figura do gráfico.
+    n: int
+        Número máximo de variáveis a serem exibidas no gráfico.
+    discrete_features: str ou list
+        Define se as variáveis devem ser tratadas como discretas ou contínuas.
+    color: str
+        Define a cor da barra no gráfico. Padrão: COR_1 (rosa).
+    """
+     fig, ax = plt.subplots(figsize = figsize)
+     get_feature_importances(database, target_variable, features, discrete_features)\
+        .sort_values(ascending=False).head(n).sort_values()\
+        .plot.barh(ax=ax, color = color, title = f'Informação mútua para conceito: {target_variable}')
+
+     plt.tight_layout()
+    
+
 
 
 
@@ -54,10 +77,6 @@ def correlation_heatmap(
     cores: List[str] = ["#ff69b4", "#e31c79", "#800040"]
 ) -> None:
     
-    
-   # palete: Tuple[str,str] = ("#e31c79", "#2ca02c")
-    paleta_cores = LinearSegmentedColormap.from_list("CustomCores", cores, N=256)
-    #paleta_cores = LinearSegmentedColormap.from_list("CustomPink", ["#ff69b4", "#e31c79", "#800040"], N=256)
     """
     Plots a heatmap of the correlation matrix for the dataframe
     
@@ -77,7 +96,8 @@ def correlation_heatmap(
     None
     """
 
-    #rosa_palette = ListedColormap(["#ff69b4", "#e31c79", "#800040"])
+    ## cria range de cores pela paleta enviada
+    paleta_cores = LinearSegmentedColormap.from_list("CustomCores", cores, N=256)
     
     correlations = database.corr(method=method, numeric_only=numeric_only)
     mask = np.zeros_like(correlations)
@@ -103,18 +123,6 @@ def correlation_heatmap(
     plt.show
 
 
-
-
-
-#################################################
-#         Plot Bivariate Distribution           #
-#################################################
-
-import matplotlib.patches as mpatches
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 
 
