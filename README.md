@@ -5,8 +5,9 @@
 </a>
 
 Projeto contendo Análise exploratória de dados e modelo para o problema do X-Health
-Criado por Natália de Faria
-Jan-Fev/2025
+
+| Criado por Natália de Faria
+| Jan-Fev/2025
 
 ## Project Organization
 

@@ -2,13 +2,14 @@ import pandas as pd
 
 
 #######################################
-#       CRIAR INDICADORES BINÁRIOS    #
+#       CRIAR FLAGS BINÁRIAS         #
 #######################################
 import pandas as pd
 
-def criar_indicadores_binarios(df: pd.DataFrame) -> pd.DataFrame:
+def criar_flags(df: pd.DataFrame
+) -> pd.DataFrame:
     """
-    Cria indicadores binários para variáveis relacionadas a riscos financeiros e retorna um DataFrame com as novas colunas.
+    Cria Flags para variáveis relacionadas a riscos financeiros e retorna um DataFrame com as novas colunas.
 
     Parâmetros:
     -----------
@@ -22,23 +23,23 @@ def criar_indicadores_binarios(df: pd.DataFrame) -> pd.DataFrame:
 
     Indicadores Criados:
     --------------------
-    - "indicador_acao_judicial" → 1 se há ações judiciais, 0 caso contrário.
-    - "indicador_protesto" → 1 se há protestos, 0 caso contrário.
-    - "indicador_dividas_vencidas" → 1 se há dívidas vencidas, 0 caso contrário.
-    - "indicador_valor_vencido" → 1 se há valores vencidos, 0 caso contrário.
-    - "indicador_valor_por_vencer" → 1 se há valores a vencer, 0 caso contrário.
-    - "indicador_valor_quitado" → 1 se já houve pagamentos, 0 caso contrário.
+    - "flag_acao_judicial" → 1 se há ações judiciais, 0 caso contrário.
+    - "flag_protesto" → 1 se há protestos, 0 caso contrário.
+    - "flag_dividas_vencidas" → 1 se há dívidas vencidas, 0 caso contrário.
+    - "flag_valor_vencido" → 1 se há valores vencidos, 0 caso contrário.
+    - "flag_valor_por_vencer" → 1 se há valores a vencer, 0 caso contrário.
+    - "flag_valor_quitado" → 1 se já houve pagamentos, 0 caso contrário.
     """
 
     df = df.copy()  # Para evitar modificações no DataFrame original
 
     # Criar indicadores binários
-    df["indicador_acao_judicial"] = (df["quant_acao_judicial"] > 0).astype(int)
-    df["indicador_protesto"] = (df["quant_protestos"] > 0).astype(int)
-    df["indicador_dividas_vencidas"] = (df["dividas_vencidas_qtd"] > 0).astype(int)
-    df["indicador_valor_vencido"] = (df["valor_vencido"] > 0).astype(int)
-    df["indicador_valor_por_vencer"] = (df["valor_por_vencer"] > 0).astype(int)
-    df["indicador_valor_quitado"] = (df["valor_quitado"] > 0).astype(int)
+    df["flag_acao_judicial"] = (df["quant_acao_judicial"] > 0).astype(int)
+    df["flag_protesto"] = (df["quant_protestos"] > 0).astype(int)
+    df["flag_dividas_vencidas"] = (df["dividas_vencidas_qtd"] > 0).astype(int)
+    df["flag_valor_vencido"] = (df["valor_vencido"] > 0).astype(int)
+    df["flag_valor_por_vencer"] = (df["valor_por_vencer"] > 0).astype(int)
+    df["flag_valor_quitado"] = (df["valor_quitado"] > 0).astype(int)
 
     return df
 
@@ -338,3 +339,88 @@ def tratar_categoricas(df: pd.DataFrame) -> pd.DataFrame:
         label_encoders[col] = le  # Salva os encoders para referência futura, se necessário
 
     return df
+
+
+
+#############################################
+#      CRIAR VARIÁVEIS COMBINADAS          #
+#############################################
+import pandas as pd
+
+def criar_variaveis_combinadas(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Cria novas variáveis combinadas para melhorar a modelagem preditiva.
+
+    Parâmetros:
+    -----------
+    df : pd.DataFrame
+        DataFrame contendo os dados originais.
+
+    Retorno:
+    --------
+    pd.DataFrame
+        O DataFrame atualizado com novas variáveis criadas.
+
+    Variáveis Criadas:
+    --------------------
+    - "razao_valor_vencido" → Razão entre valor vencido e valor total pago.
+    - "razao_valor_quitado" → Razão entre valor quitado e valor total do pedido.
+    - "media_ioi" → Média dos intervalos entre pedidos recentes.
+    - "soma_riscos" → Soma total de ações judiciais, protestos e dívidas vencidas.
+    - "historico_pagamento" → Proporção de valor quitado em relação ao total vencido e pago.
+    """
+
+    df = df.copy()  # Criar uma cópia para evitar modificar o original
+
+    # Criar razões financeiras (evita divisão por zero adicionando +1)
+    df["razao_valor_vencido"] = df["valor_vencido"] / (df["valor_quitado"] + 1)
+    df["razao_valor_quitado"] = df["valor_quitado"] / (df["valor_total_pedido"] + 1)
+
+    # Criar média dos intervalos entre pedidos
+    df["media_ioi"] = (df["ioi_3months"] + df["ioi_36months"]) / 2
+
+    # Criar soma total de riscos financeiros e jurídicos
+    df["soma_riscos"] = df["quant_acao_judicial"] + df["quant_protestos"] + df["dividas_vencidas_qtd"]
+
+    # Criar histórico de pagamento como proporção de valores pagos em relação ao vencido
+    df["historico_pagamento"] = df["valor_quitado"] / (df["valor_quitado"] + df["valor_vencido"] + 1)
+
+    return df
+
+
+
+#############################################
+#          ENCONTRAR CATEGÓRICAS            #
+#############################################
+
+def identificar_variaveis_categoricas(df: pd.DataFrame, threshold: int = 30) -> list:
+    """
+    Identifica automaticamente as variáveis categóricas no DataFrame.
+
+    Parâmetros:
+    -----------
+    df : pd.DataFrame
+        DataFrame contendo os dados.
+    threshold : int, opcional (default=30)
+        Número máximo de valores únicos para considerar uma variável numérica como categórica.
+
+    Retorno:
+    --------
+    list
+        Lista com os nomes das variáveis categóricas.
+    """
+
+    # Selecionar colunas do tipo 'object' ou 'category'
+    categorias_explicit = df.select_dtypes(include=['object', 'category']).columns.tolist()
+
+    # Identificar colunas numéricas com baixa cardinalidade (podem ser categóricas)
+    categorias_numericas = [col for col in df.select_dtypes(include=['number']).columns
+                            if df[col].nunique() <= threshold]
+
+    # Unir ambas as listas
+    variaveis_categoricas = list(set(categorias_explicit + categorias_numericas))
+
+    return variaveis_categoricas
+
+
+

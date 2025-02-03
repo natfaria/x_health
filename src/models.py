@@ -64,7 +64,8 @@ def selecionar_variaveis(df: pd.DataFrame,
                          target: str, 
                          iv_threshold: float = 0.02, 
                          corr_threshold: float = 0.85, 
-                         mi_top_n: int = 10
+                         mi_top_n: int = 10,
+                         figsize: Tuple[int,int] = (10,8)
 ):
     """
     Seleciona as variáveis mais relevantes com base em IV, correlação e MI e exibe os resultados na tela.
@@ -102,7 +103,7 @@ def selecionar_variaveis(df: pd.DataFrame,
     # Calcula e exibe a matriz de correlação
     correlation_matrix = df_selected.corr().abs()
     
-    plt.figure(figsize=(10, 8))
+    plt.figure(figsize=figsize)
     sns.heatmap(correlation_matrix, annot=True, fmt=".2f", cmap="coolwarm", square=True)
     plt.title("Matriz de Correlação")
     plt.show()

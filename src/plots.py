@@ -288,8 +288,6 @@ def plot_distribuicao_bivariada(
 #################################################
 #           Plot Distribution Graph             #
 #################################################
-
-
 def plot_grafico_distribuicao(
         database: pd.DataFrame,
         exploratory_variable: str,
