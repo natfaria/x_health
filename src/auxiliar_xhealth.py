@@ -226,7 +226,7 @@ def agrupar_atividade_principal(df: pd.DataFrame,
         # Classificar as atividades em grandes grupos
         if "comércio" in atividade or "varejo" in atividade or "atacado" in atividade or "distribuição" in atividade or 'com de' in atividade:
             return "Comércio"
-        elif "indústria" in atividade or "fábrica" in atividade or "produção" in atividade:
+        elif "indústria" in atividade or "fábrica" in atividade or "produção" in atividade or 'ind de' in atividade:
             return "Indústria"
         elif "serviço" in atividade or "consultoria" in atividade or "tecnologia" in atividade or "transporte" in atividade or "advocacia" in atividade:
             return "Serviços"
@@ -238,12 +238,84 @@ def agrupar_atividade_principal(df: pd.DataFrame,
             return "Educação"
         elif "saúde" in atividade or "hospital" in atividade or "clínica" in atividade or "farmácia" in atividade:
             return "Saúde"
+        elif 'entidades sem fins lucrativos' in atividade:
+            return 'OSC'
+        elif 'transporte' in atividade:
+            return "Transporte"
+        elif 'serv de selecao e administracao de pessoal' in atividade:
+            return 'RH'
         else:
             return "Outros"
 
     # retornar nova coluna no DataFrame com os valores agrupados
     return df[atividade_col].apply(classificar_atividade)
 
+#############################################
+#     AGRUPAR TIPOS DE COMÉRCIO             #
+#############################################
+
+def agrupar_tipo_comercio(df: pd.DataFrame, coluna: str) -> pd.DataFrame:
+    """
+    Agrupa os tipos de comércio por categorias similares e retorna um DataFrame atualizado.
+
+    Parâmetros:
+    -----------
+    df : pd.DataFrame
+        DataFrame contendo os dados a serem processados.
+    coluna : str
+        Nome da coluna que contém as descrições do comércio.
+
+    Retorno:
+    --------
+    pd.DataFrame
+        O DataFrame original com uma nova coluna "{coluna}_agrup" contendo os valores agrupados.
+
+    Agrupamentos:
+    -------------
+    - "Tecnologia & Eletrônicos" → Equipamentos de informática, componentes eletrônicos, telefonia.
+    - "Livros & Papelaria" → Livros, revistas, jornais.
+    - "Móveis & Decoração" → Móveis, artigos de decoração, estofados.
+    - "Moda & Vestuário" → Calçados, roupas, tecidos, acessórios.
+    - "Automotivo" → Autopeças, pneus, motocicletas, tratores, veículos.
+    - "Saúde & Ortopedia" → Produtos médicos, odontológicos, hospitalares.
+    - "Construção & Ferragens" → Materiais de construção, ferramentas, ferragens.
+    - "Alimentação & Bebidas" → Pães, doces, bebidas, produtos alimentícios.
+    - "Esportes & Lazer" → Produtos esportivos, brinquedos, bicicletas.
+    - "Outros" → Tipos não categorizados.
+    """
+
+    def classificar_comercio(comercio):
+        # Verificar se o valor está ausente
+        if pd.isna(comercio) or str(comercio).strip().lower() in ["nan", "", "none"]:
+            return "Desconhecido"
+
+        # Normalizar para minúsculo
+        comercio = str(comercio).strip().lower()
+
+        # Classificação por similaridade
+        if "informatica" in comercio or "eletron" in comercio or "telefones" in comercio:
+            return "Tecnologia & Eletrônicos"
+        elif "livros" in comercio or "revistas" in comercio or "jornais" in comercio:
+            return "Livros & Papelaria"
+        elif "moveis" in comercio or "decoracao" in comercio or "estofados" in comercio:
+            return "Móveis & Decoração"
+        elif "confeccoes" in comercio or "calcados" in comercio or "tecidos" in comercio:
+            return "Moda & Vestuário"
+        elif "auto pecas" in comercio or "pneus" in comercio or "motocicletas" in comercio or "tratores" in comercio or "veiculos" in comercio:
+            return "Automotivo"
+        elif "medico" in comercio or "hospitalar" in comercio or "ortopedicos" in comercio or "odontologicos" in comercio:
+            return "Saúde & Ortopedia"
+        elif "construcao" in comercio or "ferragens" in comercio or "tintas" in comercio:
+            return "Construção & Ferragens"
+        elif "alimentos" in comercio or "bebidas" in comercio or "paes" in comercio or "doces" in comercio:
+            return "Alimentação & Bebidas"
+        elif "esportivos" in comercio or "brinquedos" in comercio or "bicicletas" in comercio:
+            return "Esportes & Lazer"
+        else:
+            return "Outros"
+
+    # Retornar df com os valores novos
+    return df[coluna].apply(classificar_comercio)
 
 
 

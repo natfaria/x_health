@@ -93,6 +93,45 @@ def iv_woe(
 
 
 
+
+#################################################
+#          MI - Mutual Information              #
+#################################################
+
+def calcular_mutual_information(df: pd.DataFrame, 
+                                target: str = "default"
+) -> pd.DataFrame:
+    """
+    Calcula a Informação Mútua (Mutual Information - MI) entre as variáveis preditoras e o target.
+
+    Parâmetros:
+    -----------
+    df : pd.DataFrame
+        DataFrame contendo variáveis de interesse.
+    target : str, opcional (default="default")
+        Nome da variável alvo.
+
+    Retorno:
+    --------
+    pd.DataFrame
+        DataFrame com os valores de MI das variáveis ordenadas por importância.
+    """
+    # Selecionar apenas variáveis numéricas e remover a variável alvo
+    df_numerico = df.select_dtypes(include=['number']).drop(columns=[target], errors='ignore')
+
+    # Tratamento de NaN: Preencher com a mediana de cada coluna
+    df_numerico.fillna(df_numerico.median(), inplace=True)
+    
+     # Calcular MI
+    mi_scores = mutual_info_classif(df_numerico, df[target])
+    
+    # Aplicar no DF
+    mi_df = pd.DataFrame({"Variável": df_numerico.columns, "Mutual Information": mi_scores})
+    mi_df = mi_df.sort_values(by="Mutual Information", ascending=False).reset_index(drop=True)
+
+    return mi_df
+
+
 #################################################
 #          Razão de Probabilidades              #
 #################################################
