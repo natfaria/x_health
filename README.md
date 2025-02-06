@@ -14,6 +14,7 @@
 ## 🚀 Objetivo do Projeto
 O principal objetivo deste projeto é **prever o risco de inadimplência** de clientes B2B usando dados históricos de transações.  
 Para isso, foram explorados **modelos estatísticos e de aprendizado de máquina**, principalmente utilizando **XGBoost**.
+Para isso, foram explorados **modelos estatísticos e de aprendizado de máquina**, principalmente utilizando **XGBoost**.
 
 A base de dados inclui informações sobre:
 - Pagamentos vencidos e quitados,
@@ -26,6 +27,7 @@ Com esses dados, o modelo é treinado para prever se um novo pedido terá **defa
 ---
 
 ## 📂 Estrutura do Projeto
+Utilizando o Framework CookieCutter for DataScience, tem-se o seguinte esquema de arquivos e diretórios
 Utilizando o Framework CookieCutter for DataScience, tem-se o seguinte esquema de arquivos e diretórios
 
 ```
