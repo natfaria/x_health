@@ -4,67 +4,101 @@
     <img src="https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter" />
 </a>
 
-Projeto contendo Análise exploratória de dados e modelo para o problema do X-Health
+**X Health** é um projeto de análise exploratória de dados e modelagem preditiva para prever **risco de inadimplência** em transações B2B. Ele utiliza técnicas de Machine Learning para identificar padrões nos comportamentos de pagamento dos clientes.
 
-| Criado por Natália de Faria
-| Jan-Fev/2025
+| 📌 Criado por: Natália de Faria  
+| 📅 Período: Jan-Fev/2025  
 
-## Project Organization
+---
+
+## 🚀 Objetivo do Projeto
+O principal objetivo deste projeto é **prever o risco de inadimplência** de clientes B2B usando dados históricos de transações.  
+Para isso, exploramos **modelos estatísticos e de aprendizado de máquina**, principalmente utilizando **XGBoost**.
+
+A base de dados inclui informações sobre:
+- Pagamentos vencidos e quitados,
+- Protestos financeiros e ações judiciais,
+- Histórico de compras,
+- Opção tributária e tipo de sociedade do cliente.
+
+Com esses dados, o modelo é treinado para prever se um novo pedido terá **default = 1 (inadimplência)** ou **default = 0 (pagamento em dia)**.
+
+---
+
+## 📂 Estrutura do Projeto
 
 ```
-├── LICENSE            <- Open-source license if one is chosen
-├── Makefile           <- Makefile with convenience commands like `make data` or `make train`
-├── README.md          <- The top-level README for developers using this project.
+├── LICENSE            <- Licença open-source (se aplicável).
+├── Makefile           <- Comandos de automação (e.g., `make data`, `make train`).
+├── README.md          <- Este arquivo com a documentação do projeto.
+│
 ├── data
-│   ├── external       <- Data from third party sources.
-│   ├── interim        <- Intermediate data that has been transformed.
-│   ├── processed      <- The final, canonical data sets for modeling.
-│   └── raw            <- The original, immutable data dump.
+│   ├── external       <- Dados de terceiros.
+│   ├── interim        <- Dados intermediários transformados.
+│   ├── processed      <- Dados finais e prontos para modelagem.
+│   └── raw            <- Dados brutos e imutáveis.
 │
-├── docs               <- A default mkdocs project; see www.mkdocs.org for details
+├── docs               <- Documentação do projeto.
 │
-├── models             <- Trained and serialized models, model predictions, or model summaries
+├── models             <- Modelos treinados e serializados (pickle).
 │
-├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
-│                         the creator's initials, and a short `-` delimited description, e.g.
-│                         `1.0-jqp-initial-data-exploration`.
+├── notebooks          <- Notebooks Jupyter usados para experimentação.
 │
-├── pyproject.toml     <- Project configuration file with package metadata for 
-│                         x_health and configuration for tools like black
+├── pyproject.toml     <- Arquivo de configuração do projeto.
 │
-├── references         <- Data dictionaries, manuals, and all other explanatory materials.
+├── references         <- Dicionário de dados e materiais explicativos.
 │
-├── reports            <- Generated analysis as HTML, PDF, LaTeX, etc.
-│   └── figures        <- Generated graphics and figures to be used in reporting
+├── reports            <- Relatórios gerados (HTML, PDF, etc.).
+│   └── figures        <- Gráficos e visualizações geradas.
 │
-├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
-│                         generated with `pip freeze > requirements.txt`
+├── requirements.txt   <- Arquivo de dependências (bibliotecas necessárias).
 │
-├── setup.cfg          <- Configuration file for flake8
+├── setup.cfg          <- Configuração de estilo e linting (flake8).
 │
-└── x_health   <- Source code for use in this project.
+└── x_health   <- Código-fonte do projeto.
     │
-    ├── __init__.py             <- Makes x_health a Python module
+    ├── __init__.py             <- Torna `x_health` um módulo Python.
     │
-    ├── config.py               <- Store useful variables and configuration
+    ├── config.py               <- Configurações do projeto.
     │
-    ├── dataset.py              <- Scripts to download or generate data
+    ├── dataset.py              <- Script para manipulação de dados.
     │
-    ├── eda_utils.py            <- Scripts to help with EDA
+    ├── eda_utils.py            <- Funções auxiliares para Análise Exploratória.
     │
-    ├── features.py             <- Code to create features for modeling
+    ├── features.py             <- Criação de features para modelagem.
     │
     ├── modeling                
-    │   ├── __init__.py 
-    │   ├── predict.py          <- Code to run model inference with trained models          
-    │   └── train.py            <- Code to train models
+    │   ├── __init__.py
+    │   ├── predict.py          <- Script para inferência com modelos treinados.
+    │   └── train.py            <- Script para treinamento de modelos.
     │
-    ├── plots.py                <- Code to create visualizations
+    ├── plots.py                <- Funções para geração de visualizações.
     │
-    └── xgboost_utils           <- Script to help with data preparation and metrics for XGBoost
+    └── xgboost_utils.py        <- Funções auxiliares para XGBoost.
 ```
 
 --------
+
+---
+
+## 📦 Instalação e Configuração
+
+1️⃣ **Clone este repositório**  
+```
+git clone https://github.com/seu-usuario/x_health.git
+cd x_health
+```
+
+2️⃣ **Crie um ambiente virtual e ative-o**
+```
+python -m venv venv
+source venv/bin/activate  # No macOS/Linux
+venv\Scripts\activate     # No Windows
+```
+3️⃣ **Instale as dependências**
+```
+pip install -r requirements.txt
+```
 
 - Dicionário de dados:
 
