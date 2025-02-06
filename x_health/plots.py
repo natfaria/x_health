@@ -13,7 +13,7 @@ from typing import List, Union, Any, Optional, Tuple
 from loguru import logger
 from tqdm import tqdm
 
-from x_health.utils import get_feature_importances
+from x_health.eda_utils import get_feature_importances
 
 #from x_health.config import FIGURES_DIR, PROCESSED_DATA_DIR
 
@@ -235,8 +235,8 @@ def plot_distribuicao_bivariada(
     title_pad: Optional[int] = 40,
     xticks_labelsize: Optional[int] = 10,
     title: str = None,
-    label1: str="Inadimplências",
-    label2: str= 'Não Inadimplências'
+    label1: str="Inadimplentes",
+    label2: str= 'Adimplentes'
 
 ) -> None:
 
