@@ -1,7 +1,10 @@
 black
+dotenv
 flake8
 ipython
+ipykernel
 isort
+json
 jupyterlab
 loguru
 matplotlib
@@ -10,8 +13,14 @@ notebook
 numpy
 pandas
 pip
+pickle
 python-dotenv
+pytz
+seaborn
 scikit-learn
+scipy
+time
 tqdm
 typer
+xgboost
 -e .
