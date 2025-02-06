@@ -100,7 +100,7 @@ def prever_default(
     with open(predictions_path, "w") as file:
         json.dump(output, file, indent=4)
     
-    logger.success("Inferência concluída com sucesso!")
+    logger.success(f"Predição salva com sucesso em {predictions_path}")
     print(output)
 
     # -----------------------------------------
