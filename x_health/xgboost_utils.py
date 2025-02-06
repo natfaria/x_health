@@ -147,7 +147,8 @@ def preparar_dados(df: pd.DataFrame, target: str, test_size: float = 0.2, random
 
     # Separa variáveis preditoras (X) e variável alvo (y)
     X = df.drop(columns=[target])
-    y = df[target]
+    X = df.drop(columns=["default"])
+    y = df[target]  # Remove a coluna 'default'
 
     # Divide os dados em treino e teste com estratificação
     return train_test_split(X, y, test_size=test_size, random_state=random_state, stratify=y)
