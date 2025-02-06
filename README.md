@@ -29,12 +29,6 @@ A entrada do modelo exige informações sobre:
 | historico\_pagamento           | Proporção de pagamentos quitados em relação ao total devido |
 
 
-
-- Pagamentos vencidos e quitados,
-- Protestos financeiros e ações judiciais,
-- Histórico de compras,
-- Opção tributária e tipo de sociedade do cliente.
-
 Com esses dados, o modelo é treinado para prever se um novo pedido terá **default = 1 (inadimplência)** ou **default = 0 (pagamento em dia)**.
 
 ---
