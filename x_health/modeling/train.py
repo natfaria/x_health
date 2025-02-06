@@ -1,10 +1,27 @@
+#adicionando retorno no diretório ao caminho
+import sys
+sys.path.append('../')
+
+#ignorar warnings 
+import warnings
+warnings.filterwarnings('ignore')
+#informação de diretórios
+from x_health.config import *
+# arquivo auxiliar
+from x_health.xgboost_utils import *
+
 from pathlib import Path
 
 import typer
 from loguru import logger
 from tqdm import tqdm
+        
+import pandas as pd
+import numpy as np
+import xgboost as xgb
+import optuna
+import pickle
 
-from x_health.config import MODELS_DIR, PROCESSED_DATA_DIR
 
 app = typer.Typer()
 
@@ -12,34 +29,15 @@ app = typer.Typer()
 @app.command()
 def main(
     # ---- REPLACE DEFAULT PATHS AS APPROPRIATE ----
-    features_path: Path = PROCESSED_DATA_DIR / "features.csv",
+    features_path: Path = EXTERNAL_DATA_DIR / "dataset_2021-5-26-10-14.csv.csv",
     labels_path: Path = PROCESSED_DATA_DIR / "labels.csv",
-    model_path: Path = MODELS_DIR / "model.pkl",
+    model_path: Path = MODELS_DIR / "modelo_xgboost.pkl"
     # -----------------------------------------
 ):
-    #adicionando retorno no diretório ao caminho
-    import sys
-    sys.path.append('../')
-    #ignorar warnings 
-    import warnings
-    warnings.filterwarnings('ignore')
-    #informação de diretórios
-    from x_health.config import *
-    # arquivo auxiliar
-    from x_health.xgboost_utils import *
-        
-    import pandas as pd
-    import numpy as np
-    import xgboost as xgb
-    import optuna
-    import pickle
-        
     # ---- REPLACE THIS WITH YOUR OWN CODE ----
     
     #importando a base do arquivo externo
-    nome_base = f'{EXTERNAL_DATA_DIR}/dataset_2021-5-26-10-14.csv'
-    #nome_base = f'{PROCESSED_DATA_DIR}/01-x-health-consolid_cols.csv'
-    df = pd.read_csv(nome_base, sep = '\t', encoding='utf-8', na_values="missing")
+    df = pd.read_csv(features_path, sep = '\t', encoding='utf-8', na_values="missing")
     backup = df.copy()
     #logger.info(f'Base importada com tamanho: {len(df)}')
 
@@ -110,14 +108,10 @@ def main(
     #################################
     #       SALVAR PICKLE           #
     #################################
-    
-    # Definir o caminho do modelo e seu nome
-    caminho_modelo = f"{MODELS_DIR}/modelo_xgboost.pkl"
-    
-    with open(caminho_modelo, "wb") as file:
+    with open(model_path, "wb") as file:
         pickle.dump(model, file)
 
-    print(f"Modelo salvo em: {caminho_modelo}")
+    print(f"Modelo salvo em: {model_path}")
 
     # -----------------------------------------
 
