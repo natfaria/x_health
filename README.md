@@ -50,6 +50,8 @@ Projeto contendo Análise exploratória de dados e modelo para o problema do X-H
     │
     ├── dataset.py              <- Scripts to download or generate data
     │
+    ├── eda_utils.py            <- Scripts to help with EDA
+    │
     ├── features.py             <- Code to create features for modeling
     │
     ├── modeling                
@@ -57,7 +59,9 @@ Projeto contendo Análise exploratória de dados e modelo para o problema do X-H
     │   ├── predict.py          <- Code to run model inference with trained models          
     │   └── train.py            <- Code to train models
     │
-    └── plots.py                <- Code to create visualizations
+    ├── plots.py                <- Code to create visualizations
+    │
+    └── xgboost_utils           <- Script to help with data preparation and metrics for XGBoost
 ```
 
 --------
