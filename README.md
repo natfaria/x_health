@@ -13,7 +13,7 @@
 
 ## 🚀 Objetivo do Projeto
 O principal objetivo deste projeto é **prever o risco de inadimplência** de clientes B2B usando dados históricos de transações.  
-Para isso, exploramos **modelos estatísticos e de aprendizado de máquina**, principalmente utilizando **XGBoost**.
+Para isso, foram explorados **modelos estatísticos e de aprendizado de máquina**, principalmente utilizando **XGBoost**.
 
 A base de dados inclui informações sobre:
 - Pagamentos vencidos e quitados,
@@ -26,6 +26,7 @@ Com esses dados, o modelo é treinado para prever se um novo pedido terá **defa
 ---
 
 ## 📂 Estrutura do Projeto
+Utilizando o Framework CookieCutter for DataScience, tem-se o seguinte esquema de arquivos e diretórios
 
 ```
 ├── LICENSE            <- Licença open-source (se aplicável).
@@ -99,7 +100,50 @@ venv\Scripts\activate     # No Windows
 ```
 pip install -r requirements.txt
 ```
+▶️ Como Usar
+1. Treinar o Modelo
+Para treinar um modelo a partir dos dados processados, rode o comando:
 
+```
+python x_health/modeling/train.py
+```
+2. Fazer Previsões
+O script predict.py carrega um modelo treinado e faz previsões com base nos dados fornecidos.
+
+Exemplo de Uso
+```
+import json
+from x_health.modeling.predict import prever_default
+
+dados_teste = {
+    "flag_valor_vencido": 1,
+    "quant_protestos": 3,
+    "default_3months": 0,
+    "opcao_tributaria": "Simples Nacional",
+    "razao_valor_vencido": 2.5,
+    "forma_pagamento_agrup": "Curto prazo (16-30 dias)",
+    "periodo_fiscal": "2T",
+    "ioi_3months": 5,
+    "historico_pagamento": 0.8
+}
+
+# Rodar a previsão
+
+resultado = prever_default(dados_teste)
+
+
+# Exibir a saída
+
+print(json.dumps(resultado, indent=4))
+```
+
+Saída esperada:
+
+```
+{
+    "default": 1
+}
+```
 - Dicionário de dados:
 
 | nome_coluna                    | desc                                                                                               |
