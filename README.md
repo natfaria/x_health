@@ -15,7 +15,21 @@
 O principal objetivo deste projeto é **prever o risco de inadimplência** de clientes B2B usando dados históricos de transações.  
 Para isso, foram explorados **modelos estatísticos e de aprendizado de máquina**, principalmente utilizando **XGBoost**.
 
-A base de dados inclui informações sobre:
+A entrada do modelo exige informações sobre:
+| Nome da Feature                | Descrição                                                                                |
+| --------------------------     |----------------------------------------------------------------------------------------- |
+| flag\_valor_vencido            | Indica se há valores vencidos (1 = Sim, 0 = Não) | 
+| quant\_protestos               | Número de protestos financeiros registrados |
+| default\_3months               | Indica se houve inadimplência nos últimos 3 meses |
+| opcao\_tributaria              | Regime tributário do cliente (Simples Nacional, Lucro Real, etc.) |
+| razao\_valor_vencido           | Proporção entre valor vencido e valor total do histórico de pagamentos |
+| forma\_pagamento_agrup         | Categoria da forma de pagamento (Curto prazo, Longo prazo, etc.) |
+| periodo\_fiscal                | Período fiscal correspondente ao pedido (1T, 2T, 3T, 4T) |
+| ioi\_3months                   | Intervalo médio entre pedidos nos últimos 3 meses |
+| historico\_pagamento           | Proporção de pagamentos quitados em relação ao total devido |
+
+
+
 - Pagamentos vencidos e quitados,
 - Protestos financeiros e ações judiciais,
 - Histórico de compras,
@@ -101,6 +115,7 @@ venv\Scripts\activate     # No Windows
 ```
 pip install -r requirements.txt
 ```
+Agora o ambiente estará pronto para execução. Para mais detalhes sobre uso e previsões, consulte os scripts na pasta modeling/.
 
 ▶️ Como Usar
 1. Treinar o Modelo
@@ -148,7 +163,7 @@ Saída esperada:
     "default": 1
 }
 ```
-- Dicionário de dados:
+📊 **Dicionário de Dados**
 
 | nome_coluna                    | desc                                                                                               |
 | --------------------------     |----------------------------------------------------------------------------------------- |
