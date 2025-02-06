@@ -98,10 +98,12 @@ python -m venv venv
 source venv/bin/activate  # No macOS/Linux
 venv\Scripts\activate     # No Windows
 ```
+
 3️⃣ **Instale as dependências**
 ```
 pip install -r requirements.txt
 ```
+
 ▶️ Como Usar
 1. Treinar o Modelo
 Para treinar um modelo a partir dos dados processados, rode o comando:
@@ -109,7 +111,9 @@ Para treinar um modelo a partir dos dados processados, rode o comando:
 ```
 python x_health/modeling/train.py
 ```
+
 2. Fazer Previsões
+
 O script predict.py carrega um modelo treinado e faz previsões com base nos dados fornecidos.
 
 Exemplo de Uso
