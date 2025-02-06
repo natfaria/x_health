@@ -1,3 +1,11 @@
 {
-    "default": 0
+    "flag_valor_vencido": 0,
+    "quant_protestos": 7,
+    "default_3months": 1,
+    "opcao_tributaria": "Desconhecido",
+    "razao_valor_vencido": 0.58,
+    "forma_pagamento_agrup": "Outros",
+    "periodo_fiscal": "3T",
+    "ioi_3months": 4,
+    "historico_pagamento": 0.63
 }
