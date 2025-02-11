@@ -94,7 +94,7 @@ Utilizando o Framework CookieCutter for DataScience, tem-se o seguinte esquema d
 
 1️⃣ **Clone este repositório**  
 ```
-git clone https://github.com/seu-usuario/x_health.git
+git clone https://github.com/natfaria/x_health.git
 cd x_health
 ```
 
